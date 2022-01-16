@@ -92,6 +92,9 @@ call plug#begin('~/.vim/plugged')
     endif
   endif
 
+  # Clipboard
+  set clipboard^=unnamed
+
   " Search and Replace
   set incsearch                                " Show partial matches as search is entered.
   set hlsearch                                 " Highlight search patterns.
