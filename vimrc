@@ -54,6 +54,7 @@ call plug#begin('~/.vim/plugged')
   set history=100                              " Size of command history.
   set confirm                                  " Enable error files & error jumping.
   set autoread                                 " Automatically reload changes if detected
+  set updatetime=200                           " Set wait time for cursor related actions
 
   set tags+=tags                               " Enable tags.
   set wildignore+=*/.git/*,*/tmp/*,*.swp       " Ignore files that aren't needed.
@@ -81,7 +82,14 @@ call plug#begin('~/.vim/plugged')
   " Persistent Undo
   if has('persistent_undo')
     set undofile
-    set undodir=~/.vim/undo
+
+    if has('nvim-0.5')
+      " New format in https://github.com/neovim/neovim/pull/13973 (f42e932,
+      " 2021-04-13).
+      set undodir=~/.vim/undo2
+    else
+      set undodir=~/.vim/undo
+    endif
   endif
 
   " Search and Replace
@@ -145,7 +153,7 @@ call plug#begin('~/.vim/plugged')
     highlight colorcolumn ctermbg=236 guibg=#262D51
   endif
 
-  Plug 'chriskempson/base16-vim'               " Theme
+  Plug 'fnune/base16-vim'                      " Theme
   Plug 'ryanoasis/vim-devicons'                " Icons for statusbar and other plugins
 
   " vim-airline {{{
@@ -155,11 +163,9 @@ call plug#begin('~/.vim/plugged')
       let g:airline_theme = 'base16'
       let g:airline_powerline_fonts = 1
       let g:airline_detect_modified = 1
-      let g:airline#extensions#ale#enabled = 1
       let g:airline#extensions#whitespace#enabled = 1
       let g:airline#extensions#hunks#enabled = 0
-      let g:airline_section_error = '%{airline#util#wrap(airline#extensions#coc#get_error(),0)}'
-      let g:airline_section_warning = '%{airline#util#wrap(airline#extensions#coc#get_warning(),0)}'
+      let g:airline#extensions#coc#enabled = 1
     " }}}
 " }}}
 
@@ -201,33 +207,12 @@ call plug#begin('~/.vim/plugged')
     Plug 'tpope/vim-fugitive'                  " Git commands in vim
   " }}}
 
-  " vim-signify {{{
-    Plug 'mhinz/vim-signify'
-
-    let g:signify_vcs_list = ['git']
-    let g:signify_sign_add               = '┃'
-    let g:signify_sign_delete            = '-'
-    let g:signify_sign_delete_first_line = '_'
-    let g:signify_sign_change = '┃'
-  " }}}
-
   " Fuzzy Finder and Search (FZF) {{{
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
 
     " Override the default command with ripgrep to include all files
     let $FZF_DEFAULT_COMMAND='rg --files --hidden --ignore --glob "!.git/*"'
-
-    " Text search using ripgrep
-    function! RipgrepFzf(query, fullscreen)
-      let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case --hidden --ignore --glob "!.git/*" -- %s || true'
-      let initial_command = printf(command_fmt, shellescape(a:query))
-      let reload_command = printf(command_fmt, '{q}')
-      let spec = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
-      call fzf#vim#grep(initial_command, 1, fzf#vim#with_preview(spec), a:fullscreen)
-    endfunction
-
-    command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
 
     " Open new buffers from fzf
     let g:fzf_action = {
@@ -257,9 +242,10 @@ call plug#begin('~/.vim/plugged')
     " Mappings for file finder and fuzzy search
     nnoremap <silent> <leader>t :Files<CR>
     nnoremap <silent> <leader>b :Buffers<CR>
+    nnoremap <silent> <leader>m :History<CR>
 
     " Use our own search instead of built :Rg so we don't follow links
-    nnoremap <leader>f :RG<space>
+    nnoremap <leader>f :Rg<space>
   " }}}
 
   " vim-eunuch {{{
@@ -309,11 +295,10 @@ call plug#begin('~/.vim/plugged')
   " }}}
 
   " JavaScript and TypeScript {{{
-    Plug 'othree/yajs.vim'                     " JavaScript (ES6, ES7, ES8) syntax support
-    Plug 'othree/es.next.syntax.vim'           " JavaScript ESNext syntax support
+    Plug 'HerringtonDarkholme/yats.vim'        " TypeScript
+    Plug 'yuezk/vim-js'                        " JavaScript
+    Plug 'maxmellon/vim-jsx-pretty'            " TSX and JSX
     Plug 'jparise/vim-graphql'                 " GraphQL syntax support including within tags
-    Plug 'mxw/vim-jsx'                         " JSX syntax support
-    Plug 'HerringtonDarkholme/yats.vim'        " TypeScript syntax support
   " }}}
 
   " Go {{{
@@ -329,70 +314,41 @@ call plug#begin('~/.vim/plugged')
 " }}}
 
 " Completion and Linting {{{
-  " ale {{{
-    let g:ale_completion_enabled = 0       " Disable completion before loading ale
-
-    Plug 'dense-analysis/ale'
-
-
-    let g:ale_sign_error = '⚠'
-    let g:ale_sign_warning = '⚠'
-    let g:ale_echo_msg_error_str = '⚠'
-    let g:ale_echo_msg_warning_str = '⚠'
-    let g:ale_echo_msg_format = '%severity% %s [%linter%% code%]'
-
-    " Sign highlight colours (gutter)
-    highlight link ALEErrorSign Exception
-    highlight link ALEStyleErrorSign Exception
-    highlight link ALEWarningSign Todo
-    highlight link ALEStyleWarningSign ALEWarningSign
-    highlight link ALEInfoSign ALEWarningSign
-
-    " ale doesn't highlight partial lines like coc, only whole lines
-    " so use something less obtrusive than the defaults
-    highlight link ALEError Error
-    highlight link ALEErrorLine Error
-    highlight link ALEWarning Todo
-    highlight link ALEWarningLine Todo
-    highlight link ALEInfoLine Todo
-
-    let g:ale_linters = {
-      \ 'javascript': ['eslint', 'prettier'],
-      \ 'typescript': ['tslint', 'eslint', 'prettier'],
-      \ 'typescript.tsx': ['tslint', 'eslint', 'prettier'],
-      \ 'terraform': ['tflint'] }
-    let g:ale_fixers = {
-      \ '*': ['remove_trailing_lines', 'trim_whitespace'],
-      \ 'typescript': ['tslint', 'eslint', 'prettier'],
-      \ 'typescript.tsx': ['tslint', 'eslint', 'prettier'],
-      \ 'javascript': ['eslint'],
-      \ 'yaml': ['prettier'],
-      \ 'terraform': ['terraform'] }
-    let g:ale_javascript_prettier_use_local_config = 1
-    let g:ale_fix_on_save = 1
-  " }}}
-
   " COC {{{
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
-    " Line highlight colours
-    highlight link CocErrorHighlight Underlined
-    highlight link CocWarningHighlight WarningMsg
-    highlight link CocInfoHighlight Todo
 
     " List of extensions.
     let g:coc_global_extensions = [
       \  'coc-css',
-      \  'coc-html',
-      \  'coc-yaml',
-      \  'coc-json',
-      \  'coc-stylelint',
-      \  'coc-tag',
-      \  'coc-solargraph',
+      \  'coc-eslint',
+      \  'coc-git',
       \  'coc-highlight',
-      \  'coc-snippets',
+      \  'coc-html',
+      \  'coc-json',
+      \  'coc-prettier',
+      \  'coc-solargraph',
+      \  'coc-stylelint',
       \  'coc-tsserver',
-      \  'coc-tslint-plugin']
+      \  'coc-yaml']
+
+    let g:coc_user_config = {
+      \  "eslint.autoFixOnSave": "true",
+      \  "git.addedSign.text": "┃",
+      \  "git.addedSign.hlGroup": "DiffAdded",
+      \  "git.changedSign.hlGroup": "DiffLine",
+      \  "git.changedSign.text": "┃",
+      \  "git.changeRemovedSign.text": "-",
+      \  "git.removedSign.hlGroup": "DiffRemoved",
+      \  "git.changeRemovedSign.hlGroup": "DiffRemoved",
+      \  "git.topRemovedSign.hlGroup": "DiffRemoved",
+      \  "highlight.document.enable": "true",
+      \  "highlight.colors.enable": "true",
+      \  "highlight.colorNames.enable": "true",
+      \  "solargraph.promptDownload": "false",
+      \  "yaml.format.enable": "true",
+      \  "coc.preferences.colorSupport": "true",
+      \  "coc.preferences.formatOnSaveFiletypes": ["markdown", "javascript", "javascript.jsx", "typescript", "typescript.tsx", "ruby", "yaml"]
+      \ }
 
     " Use tab for trigger completion with characters ahead and navigate.
     " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
@@ -443,6 +399,15 @@ call plug#begin('~/.vim/plugged')
 
     " Remap for rename current word
     nmap <leader>rn <Plug>(coc-rename)
+
+    " Remap for scrolling popup window
+    nnoremap <nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+    nnoremap <nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+    inoremap <nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+    inoremap <nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+
+    " Configure coc-highlight
+    autocmd CursorHold * silent call CocActionAsync('highlight')
   " }}}
 " }}}
 
@@ -452,4 +417,15 @@ call plug#end()
   " base16-shell 256 colour support
   let base16colorspace=256
   colorscheme base16-tomorrow-night
+" }}}
+
+" COC Colours {{{
+  " Set colours after theme otherwise they get overwritten
+  highlight link CocErrorHighlight Underlined
+  highlight link CocWarningHighlight WarningMsg
+  highlight link CocInfoFloat NormalFloat
+  highlight link CocHintFloat NormalFloat
+  highlight! link CocHighlightText Search
+  highlight! link CocHighlightRead Search
+  highlight! link CocHighlightWrite Search
 " }}}
