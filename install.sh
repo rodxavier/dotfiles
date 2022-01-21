@@ -26,17 +26,9 @@ main_dotfiles=(
   colours
 )
 
-declare -A xdg_config
-xdg_config=(
-  [vim]=nvim
-)
-
 for file in "${main_dotfiles[@]}";
 do
   ln -nfs "$ROOT/$file" "$HOME/.$file"
 done
 
-for file in "${!xdg_config[@]}";
-do
-  ln -nfs "$ROOT/$file" "$HOME/.config/${xdg_config[$file]}"
-done
+ln -nfs "$ROOT/vim" "$HOME/.config/nvim"

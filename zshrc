@@ -35,3 +35,4 @@ alias mux='tmuxinator'
 alias tf='terraform'
 alias k='kubectl'
 alias kx='kubectx'
+eval "$(pyenv init -)"

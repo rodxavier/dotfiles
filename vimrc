@@ -92,7 +92,7 @@ call plug#begin('~/.vim/plugged')
     endif
   endif
 
-  # Clipboard
+  " Clipboard
   set clipboard^=unnamed
 
   " Search and Replace
@@ -332,7 +332,8 @@ call plug#begin('~/.vim/plugged')
       \  'coc-solargraph',
       \  'coc-stylelint',
       \  'coc-tsserver',
-      \  'coc-yaml']
+      \  'coc-yaml',
+      \  'coc-pyright']
 
     let g:coc_user_config = {
       \  "eslint.autoFixOnSave": "true",
@@ -350,7 +351,13 @@ call plug#begin('~/.vim/plugged')
       \  "solargraph.promptDownload": "false",
       \  "yaml.format.enable": "true",
       \  "coc.preferences.colorSupport": "true",
-      \  "coc.preferences.formatOnSaveFiletypes": ["markdown", "javascript", "javascript.jsx", "typescript", "typescript.tsx", "ruby", "yaml"]
+      \  "python.formatting.provider": "black",
+      \  "pyright.organizeimports.provider": "isort",
+      \  "python.linting.pylintEnabled": "true",
+      \  "python.linting.flake8Enabled": "true",
+      \  "python.linting.banditEnabled": "true",
+      \  "python.linting.mypyEnabled": "true",
+      \  "coc.preferences.formatOnSaveFiletypes": ["markdown", "javascript", "javascript.jsx", "typescript", "typescript.tsx", "ruby", "yaml", "python"]
       \ }
 
     " Use tab for trigger completion with characters ahead and navigate.
@@ -411,6 +418,9 @@ call plug#begin('~/.vim/plugged')
 
     " Configure coc-highlight
     autocmd CursorHold * silent call CocActionAsync('highlight')
+
+    " Configure coc-pyright
+    autocmd FileType python let b:coc_root_patterns = ['.git', '.env', 'venv', '.venv', 'setup.cfg', 'setup.py', 'pyproject.toml', 'pyrightconfig.json']
   " }}}
 " }}}
 
