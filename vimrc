@@ -316,6 +316,10 @@ call plug#begin('~/.vim/plugged')
   " }}}
 " }}}
 
+" Github Copilot{{{
+    Plug 'github/copilot.vim'
+" }}}}
+
 " Completion and Linting {{{
   " COC {{{
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
