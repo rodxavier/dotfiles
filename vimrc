@@ -163,7 +163,7 @@ call plug#begin('~/.vim/plugged')
       Plug 'vim-airline/vim-airline'
       Plug 'vim-airline/vim-airline-themes'
 
-      let g:airline_theme = 'base16'
+      let g:airline_theme = 'base16_tomorrow_night'
       let g:airline_powerline_fonts = 1
       let g:airline_detect_modified = 1
       let g:airline#extensions#whitespace#enabled = 1
