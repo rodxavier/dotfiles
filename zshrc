@@ -32,3 +32,6 @@ alias mux='tmuxinator'
 alias tf='terraform'
 alias k='kubectl'
 alias kx='kubectx'
+
+. /opt/homebrew/opt/asdf/libexec/asdf.sh
+export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
