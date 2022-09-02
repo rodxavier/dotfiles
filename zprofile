@@ -45,6 +45,7 @@ typeset -gU cdpath fpath mailpath path
 path=(
   /usr/local/{bin,sbin}
   /opt/homebrew/bin
+  /Applications/Postgres.app/Contents/Versions/latest/bin
   $path
 )
 

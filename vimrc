@@ -152,7 +152,7 @@ call plug#begin('~/.vim/plugged')
   set foldnestmax=10                           " Deepest fold is 10 levels
 
   if exists('+colorcolumn')
-    set colorcolumn=120
+    set colorcolumn=100
     highlight colorcolumn ctermbg=236 guibg=#262D51
   endif
 

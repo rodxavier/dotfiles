@@ -32,6 +32,7 @@ alias mux='tmuxinator'
 alias tf='terraform'
 alias k='kubectl'
 alias kx='kubectx'
+alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
 
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
 export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+. /opt/homebrew/opt/asdf/libexec/asdf.sh
