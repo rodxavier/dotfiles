@@ -316,6 +316,10 @@ call plug#begin('~/.vim/plugged')
   " }}}
 " }}}
 
+" Github Copilot{{{
+   Plug 'github/copilot.vim'
+" }}}}
+
 " Completion and Linting {{{
   " COC {{{
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
@@ -351,12 +355,9 @@ call plug#begin('~/.vim/plugged')
       \  "solargraph.promptDownload": "false",
       \  "yaml.format.enable": "true",
       \  "coc.preferences.colorSupport": "true",
-      \  "python.formatting.provider": "black",
-      \  "pyright.organizeimports.provider": "isort",
-      \  "python.linting.pylintEnabled": "true",
-      \  "python.linting.flake8Enabled": "true",
-      \  "python.linting.banditEnabled": "true",
-      \  "python.linting.mypyEnabled": "true",
+      \  "python.formatting.provider": "ruff",
+      \  "pyright.organizeimports.provider": "ruff",
+      \  "python.linting.ruffEnabled": "true",
       \  "coc.preferences.formatOnSaveFiletypes": ["markdown", "javascript", "javascript.jsx", "typescript", "typescript.tsx", "ruby", "yaml", "python"]
       \ }
 

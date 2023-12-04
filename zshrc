@@ -36,3 +36,5 @@ alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
 
 export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
+export PATH="$PATH:/Applications/Postgres.app/Contents/Versions/latest/bin/"
+export PATH="$PATH:/Users/rodxavier/.cargo/bin"
