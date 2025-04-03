@@ -319,6 +319,9 @@ call plug#begin('~/.vim/plugged')
 " Github Copilot{{{
    Plug 'github/copilot.vim'
 " }}}}
+" Python {{{
+   Plug 'tmhedberg/SimpylFold'
+" }}}
 
 " Completion and Linting {{{
   " COC {{{
@@ -422,9 +425,16 @@ call plug#begin('~/.vim/plugged')
 
     " Configure coc-pyright
     autocmd FileType python let b:coc_root_patterns = ['.git', '.env', 'venv', '.venv', 'setup.cfg', 'setup.py', 'pyproject.toml', 'pyrightconfig.json']
+
+    " Code companion
+    Plug 'nvim-lua/plenary.nvim'
+    Plug 'nvim-treesitter/nvim-treesitter'
+    Plug 'olimorris/codecompanion.nvim'
+    Plug 'nvim-telescope/telescope.nvim' " optional
+    Plug 'cuducos/yaml.nvim'
   " }}}
 " }}}
-
+"
 call plug#end()
 
 " Theme {{{
@@ -443,3 +453,7 @@ call plug#end()
   highlight! link CocHighlightRead Search
   highlight! link CocHighlightWrite Search
 " }}}
+
+lua << EOF
+  require("codecompanion").setup()
+EOF
